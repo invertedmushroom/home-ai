@@ -1,0 +1,30 @@
+{
+  "connections": [
+    {
+      "id": "openai-api",
+      "label": "OpenAI",
+      "kind": "openai",
+      "api_key_env": "OPENAI_API_KEY",
+      "resource_group": "openai-api"
+    }
+  ],
+  "default_profile": "openai-mini",
+  "profiles": [
+    {
+      "id": "openai-mini",
+      "label": "GPT-5.4 Mini",
+      "backend": "openai-api",
+      "model": "gpt-5.4-mini",
+      "tool_calls": true,
+      "vision": true
+    },
+    {
+      "id": "openai-full",
+      "label": "GPT-5.4",
+      "backend": "openai-api",
+      "model": "gpt-5.4",
+      "tool_calls": true,
+      "vision": true
+    }
+  ]
+}

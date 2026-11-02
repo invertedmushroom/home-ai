@@ -1,0 +1,46 @@
+{
+  "connections": [
+    {
+      "id": "local-llama",
+      "label": "Local llama-server",
+      "kind": "compatible",
+      "base_url": "http://127.0.0.1:8080/v1",
+      "runtime": "llamacpp",
+      "resource_group": "local-gpu",
+      "discovery": "llamacpp"
+    },
+    {
+      "id": "local-lmstudio",
+      "label": "Local LM Studio",
+      "kind": "lmstudio",
+      "base_url": "http://127.0.0.1:1234/v1",
+      "resource_group": "local-gpu"
+    }
+  ],
+  "default_profile": "gemma-local",
+  "profiles": [
+    {
+      "id": "gemma-local",
+      "label": "Gemma E4B",
+      "backend": "local-llama",
+      "model": "google/gemma-4-e4b",
+      "tool_calls": true
+    },
+    {
+      "id": "saluki-local",
+      "label": "Saluki 27B",
+      "backend": "local-lmstudio",
+      "model": "underdog-saluki-27b-1.0",
+      "tool_calls": true,
+      "vision": true
+    },
+    {
+      "id": "qwen-local",
+      "label": "Qwen 35B A3B Distill",
+      "backend": "local-lmstudio",
+      "model": "qwen3.8-35b-a3b-distill-mtp-apex-i-miniplus-v2.1-abliterated",
+      "tool_calls": true,
+      "vision": true
+    }
+  ]
+}

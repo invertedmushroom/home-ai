@@ -1,0 +1,9 @@
+node_modules
+target
+data
+test-results
+package-lock.json
+Cargo.lock
+apps/web/dist
+.agents
+AGENTS.md

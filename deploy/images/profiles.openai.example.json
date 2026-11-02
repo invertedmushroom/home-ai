@@ -1,0 +1,20 @@
+[
+  {
+    "id": "openai-flare",
+    "label": "OpenAI Flare · image generation and editing",
+    "provider": "openai",
+    "endpoint": "https://api.openai.com/v1",
+    "api_key_env": "OPENAI_API_KEY",
+    "resource_group": "openai-images",
+    "settings": { "model": "gpt-image-2.5-flare", "size": "1024x1024", "quality": "low" }
+  },
+  {
+    "id": "openai-sunburst",
+    "label": "OpenAI Sunburst · image generation and editing",
+    "provider": "openai",
+    "endpoint": "https://api.openai.com/v1",
+    "api_key_env": "OPENAI_API_KEY",
+    "resource_group": "openai-images",
+    "settings": { "model": "gpt-image-2.5-sunburst", "size": "1024x1024", "quality": "low" }
+  }
+]

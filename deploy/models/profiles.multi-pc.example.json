@@ -1,0 +1,37 @@
+{
+  "connections": [
+    {
+      "id": "linux-text",
+      "label": "Local GPU PC",
+      "kind": "lmstudio",
+      "base_url": "http://127.0.0.1:1234/v1",
+      "api_key_env": "TEXT_PC_API_KEY",
+      "resource_group": "text-pc-gpu"
+    },
+    {
+      "id": "second-text",
+      "label": "Second GPU PC via SSH",
+      "kind": "lmstudio",
+      "base_url": "http://127.0.0.1:1235/v1",
+      "api_key_env": "SECOND_TEXT_PC_API_KEY",
+      "resource_group": "second-text-pc-gpu"
+    }
+  ],
+  "default_profile": "saluki",
+  "profiles": [
+    {
+      "id": "saluki",
+      "label": "Saluki 27B",
+      "backend": "linux-text",
+      "model": "underdog-saluki-27b-1.0",
+      "tool_calls": true
+    },
+    {
+      "id": "qwen",
+      "label": "Qwen distill",
+      "backend": "second-text",
+      "model": "qwen3.8-35b-a3b-distill-mtp-apex-i-miniplus-v2.1-abliterated",
+      "tool_calls": true
+    }
+  ]
+}

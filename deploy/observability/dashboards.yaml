@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: Deep
+    orgId: 1
+    folder: Deep
+    type: file
+    disableDeletion: true
+    editable: false
+    options:
+      path: /otel-lgtm/deep-overview.json

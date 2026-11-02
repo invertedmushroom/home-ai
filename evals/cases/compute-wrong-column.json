@@ -1,0 +1,18 @@
+{
+  "id": "compute-wrong-column",
+  "provenance": "Chat session 2026-10-31 (g.md log), hosted model gpt-5.4-mini. The original transcript and CSV exist only in that session; recorded here from the conversation narrative on 2026-11-01.",
+  "capability": "url-import + compute",
+  "original_fault": "Executed successfully, answered wrongly: the script selected the first header matching /erupt/i, which was eruption length rather than the wait column, and reported ~3.49 minutes as the average time between eruptions. The correct answer from the 272-row data is ~70.9 minutes.",
+  "setup": {
+    "files": {},
+    "assets": [],
+    "fixture": "MISSING: supply the original Old Faithful CSV (272 rows; minute-based eruption-length and eruption-wait columns) as the imported asset when replaying."
+  },
+  "prompt": "Import this CSV and tell me the average time between eruptions.",
+  "expect": [
+    "The answer names the wait/interval column explicitly and distinguishes it from eruption length.",
+    "For the original dataset the reported average is approximately 70.9 minutes.",
+    "Successful script execution is never treated as proof that the right column was used."
+  ],
+  "notes": "This case exists because a green execution receipt accompanied a wrong answer. It guards column-selection errors specifically, not compute plumbing."
+}

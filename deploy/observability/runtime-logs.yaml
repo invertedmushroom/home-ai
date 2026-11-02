@@ -1,0 +1,54 @@
+# This optional agent runs beside the runtimes, independently of Deep.
+receivers:
+  file_log/llama:
+    include: ['${env:DEEP_LLAMA_LOG_INCLUDE}']
+    start_at: beginning
+    storage: file_storage
+    include_file_name: false
+    max_log_size: 64KiB
+    max_concurrent_files: 8
+    resource:
+      service.name: llama-server
+      service.namespace: deep-runtime
+      host.name: '${env:DEEP_LOG_HOST}'
+  file_log/wangp:
+    include: ['${env:DEEP_WANGP_LOG_INCLUDE}']
+    start_at: beginning
+    storage: file_storage
+    include_file_name: false
+    max_log_size: 64KiB
+    max_concurrent_files: 8
+    resource:
+      service.name: wangp
+      service.namespace: deep-runtime
+      host.name: '${env:DEEP_LOG_HOST}'
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+    path: /ready
+  file_storage:
+    directory: '${env:DEEP_LOG_CHECKPOINT_DIR}'
+    create_directory: true
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 128
+    spike_limit_mib: 32
+  batch:
+    send_batch_size: 256
+    timeout: 1s
+exporters:
+  otlp_http/receiver:
+    endpoint: '${env:DEEP_LOG_EXPORT_ENDPOINT}'
+    timeout: 2s
+    sending_queue:
+      queue_size: 32
+    retry_on_failure:
+      enabled: false
+service:
+  extensions: [health_check, file_storage]
+  pipelines:
+    logs:
+      receivers: [file_log/llama, file_log/wangp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp_http/receiver]

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "flux-klein-4b",
+    "label": "FLUX.2 Klein 4B",
+    "endpoint": "http://127.0.0.1:8000/mcp",
+    "settings": {
+      "model_type": "flux2_klein_4b",
+      "resolution": "512x512",
+      "num_inference_steps": 4,
+      "activated_loras": [],
+      "loras_multipliers": ""
+    }
+  }
+]

@@ -1,0 +1,19 @@
+services:
+  deep:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    ports:
+      - '127.0.0.1:4317:4317'
+    environment:
+      DEEP_PROVIDER: ${DEEP_PROVIDER:-demo}
+      DEEP_MODEL_BASE_URL: ${DEEP_MODEL_BASE_URL:-http://host.docker.internal:8080/v1}
+      DEEP_MODEL_ID: ${DEEP_MODEL_ID:-}
+      DEEP_MODEL_API_KEY: ${DEEP_MODEL_API_KEY:-}
+      DEEP_MODEL_TIMEOUT_SECONDS: ${DEEP_MODEL_TIMEOUT_SECONDS:-180}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - deep-data:/app/data
+volumes:
+  deep-data:

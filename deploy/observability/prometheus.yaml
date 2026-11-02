@@ -1,0 +1,11 @@
+global:
+  scrape_native_histograms: true
+otlp:
+  keep_identifying_resource_attributes: true
+  promote_resource_attributes:
+    - service.name
+    - service.version
+    - service.instance.id
+storage:
+  tsdb:
+    out_of_order_time_window: 10m

@@ -1,0 +1,41 @@
+name: deep-search
+
+services:
+  searxng:
+    image: docker.io/searxng/searxng@sha256:f1bbc31c7bef7a7d8dd2b105c8397eb7dea1eeb7eceebdd45c0c29aef38c0c91
+    user: '977:977'
+    ports:
+      - '127.0.0.1:8888:8080'
+    environment:
+      SEARXNG_SECRET: ${DEEP_SEARCH_SECRET:?Run node scripts/search-init.mjs first}
+      GRANIAN_WORKERS: '1'
+      GRANIAN_ACCESS_LOG_ENABLED: 'false'
+      FORCE_OWNERSHIP: 'false'
+    volumes:
+      - ./settings.yml:/etc/searxng/settings.yml:ro
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,noexec,size=64m,uid=977,gid=977
+      - /var/cache/searxng:rw,nosuid,noexec,size=64m,uid=977,gid=977
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 128
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          CMD,
+          /usr/local/searxng/.venv/bin/python,
+          -c,
+          'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8080/healthz", timeout=2).read()',
+        ]
+      interval: 15s
+      timeout: 3s
+      start_period: 30s
+    logging:
+      driver: local
+      options:
+        max-size: 1m
+        max-file: '2'

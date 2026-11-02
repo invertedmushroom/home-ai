@@ -1,0 +1,26 @@
+{
+  "id": "workspace-literal-search",
+  "provenance": "Synthetic task added on 2026-11-02 to distinguish literal source search from regular-expression matching and preserve unrelated content.",
+  "capability": "workspace-files",
+  "original_fault": "Source contents were not searchable through native file tools. A regular-expression interpretation of punctuation can also select unrelated versions.",
+  "setup": {
+    "files": {
+      "docs/release.md": "Current release: v1.2\nKeep the example v1x2 unchanged.\n",
+      "config.txt": "version=v1.2\n",
+      "keep.txt": "v1x2 is an unrelated literal string.\n"
+    },
+    "assets": []
+  },
+  "prompt": "Find every literal occurrence of v1.2 in the project and change it to v1.3. Leave v1x2 and all other bytes unchanged. Use workspace search and targeted edits, then verify the old literal no longer appears.",
+  "expect": [
+    "Both literal v1.2 occurrences become v1.3.",
+    "The two v1x2 strings and all unrelated text stay unchanged."
+  ],
+  "checks": {
+    "files": {
+      "docs/release.md": "Current release: v1.3\nKeep the example v1x2 unchanged.\n",
+      "config.txt": "version=v1.3\n"
+    }
+  },
+  "notes": "A completed model run passes only if the published project has the requested exact transformation."
+}

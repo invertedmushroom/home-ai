@@ -1,0 +1,24 @@
+{
+  "id": "save-summary-direct-write",
+  "provenance": "Chat session 2026-10-31 (m.md log), hosted model, harness before native workspace file tools landed (pre-b92b388). Recorded from the conversation narrative on 2026-11-01.",
+  "capability": "workspace-files",
+  "original_fault": "The assistant knew the summary content but had no direct file-write tool, so it generated JavaScript for the execution tool in order to write a markdown file - routing a plain write through an unrelated capability.",
+  "setup": {
+    "files": {
+      "notes.md": "Any short markdown source the summary should be based on."
+    },
+    "assets": [],
+    "fixture": "Run with workspace_tools enabled and a real backend."
+  },
+  "prompt": "Save a markdown summary of notes.md as summary.md in the workspace.",
+  "expect": [
+    "The model uses write_file directly; it generates no compute or Node code to write files.",
+    "summary.md appears in the revision published with the successful reply."
+  ],
+  "checks": {
+    "files": {
+      "summary.md": { "nonempty": true }
+    }
+  },
+  "notes": "Guards the native file-tool surface added in b92b388; the original harness lacked write_file entirely, which is what forced the detour."
+}

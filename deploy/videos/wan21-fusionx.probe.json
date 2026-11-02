@@ -1,0 +1,14 @@
+{
+  "model_type": "t2v",
+  "prompt": "A small orange paper boat gently rocking on calm blue water. Locked camera, soft morning light, no text.",
+  "resolution": "256x256",
+  "video_length": 9,
+  "force_fps": "16",
+  "num_inference_steps": 4,
+  "guidance_scale": 1,
+  "flow_shift": 5,
+  "sample_solver": "unipc",
+  "activated_loras": ["Wan2.1_T2V_14B_FusionX_LoRA.safetensors"],
+  "loras_multipliers": "1",
+  "seed": 42
+}

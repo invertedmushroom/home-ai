@@ -1,0 +1,10 @@
+.git
+node_modules
+target
+data
+test-results
+.env
+.env.*
+apps/web/dist
+../Wan2GP
+

@@ -1,0 +1,1299 @@
+{
+  "uid": "deep-overview",
+  "title": "Deep · development overview",
+  "schemaVersion": 39,
+  "version": 2,
+  "editable": false,
+  "refresh": "5s",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "tags": ["deep", "local"],
+  "templating": {
+    "list": [
+      {
+        "name": "instance",
+        "label": "Deep process",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "query": {
+          "query": "label_values(deep_observability_snapshot_timestamp_seconds{service_name=\"deep-server\"},service_instance_id)",
+          "refId": "instance"
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "options": []
+      },
+      {
+        "name": "runtime",
+        "label": "Runtime",
+        "type": "custom",
+        "query": "llama-server,wangp",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "options": []
+      },
+      {
+        "name": "log_search",
+        "label": "Log contains",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "selected": true,
+          "text": "",
+          "value": ""
+        },
+        "options": []
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 100,
+      "title": "Live status",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 1,
+      "title": "Sample age",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 15
+              }
+            ]
+          },
+          "noValue": "No heartbeat"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "time() - min(deep_observability_snapshot_timestamp_seconds{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+          "instant": true
+        }
+      ],
+      "description": "Worst age across selected processes. Red after 15 seconds. A stopped process can remain visible until Prometheus marks its series stale."
+    },
+    {
+      "id": 22,
+      "title": "Read errors",
+      "type": "stat",
+      "gridPos": {
+        "x": 4,
+        "y": 1,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "None observed",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(deep_observability_snapshot_failures_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+          "instant": true
+        }
+      ],
+      "description": "Failures observed since the selected processes started. An absent counter means no failure observation was exported; check sampler age too."
+    },
+    {
+      "id": 2,
+      "title": "Queued",
+      "type": "stat",
+      "gridPos": {
+        "x": 8,
+        "y": 1,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(deep_run_queued{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Running",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 1,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(deep_run_active{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Unresolved",
+      "type": "stat",
+      "gridPos": {
+        "x": 16,
+        "y": 1,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(deep_ownership_unresolved{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "title": "Acquired",
+      "type": "stat",
+      "gridPos": {
+        "x": 20,
+        "y": 1,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "No observations"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(deep_resource_acquisitions_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\",outcome=\"acquired\"})",
+          "instant": true
+        }
+      ],
+      "description": "Successful stage acquisitions since selected process startup. This is cumulative, not GPU utilization."
+    },
+    {
+      "id": 5,
+      "title": "Deep resource slots and waiters",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 7
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "axisSoftMax": 1
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(resource_group)(deep_resource_active{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+          "legendFormat": "{{resource_group}} · active"
+        },
+        {
+          "refId": "B",
+          "expr": "sum by(resource_group)(deep_resource_queued{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+          "legendFormat": "{{resource_group}} · waiting"
+        }
+      ],
+      "description": "These are Deep's leased stage slots, not whole-device GPU utilization. Other runtimes/clients can bypass them."
+    },
+    {
+      "id": 24,
+      "title": "Throughput / minute",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Settled runs, returned model calls and acquired resource stages per minute. Multi-turn/image runs can make multiple calls/acquisitions. Rates need at least two exported samples.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:/min",
+          "noValue": "No observations",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "axisSoftMax": 1
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull"]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by(backend)(rate(deep_run_finished_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval]))",
+          "legendFormat": "{{backend}} · runs"
+        },
+        {
+          "refId": "B",
+          "expr": "60 * sum by(backend)(rate(deep_model_calls_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval]))",
+          "legendFormat": "{{backend}} · model calls"
+        },
+        {
+          "refId": "C",
+          "expr": "60 * sum by(resource_group)(rate(deep_resource_acquisitions_total{outcome=\"acquired\",service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval]))",
+          "legendFormat": "{{resource_group}} · acquired stages"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 7
+      }
+    },
+    {
+      "id": 25,
+      "title": "Recent runs · click a trace",
+      "type": "table",
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "description": "Newest root run traces in the selected time range/processes. Delivery/search can lag by about 30 seconds. Trace duration can include owned cleanup after the parent settles.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "traceql",
+          "query": "{ resource.service.name = \"deep-server\" && name = \"run\" && resource.service.instance.id =~ \"${instance:regex}\" } with (most_recent=true)",
+          "limit": 25,
+          "tableType": "traces"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "sortBy": [
+          {
+            "displayName": "Start time",
+            "desc": true
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 24,
+        "h": 8
+      }
+    },
+    {
+      "id": 101,
+      "title": "Latency · queues, generation and recovery",
+      "type": "row",
+      "collapsed": true,
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [
+        {
+          "id": 30,
+          "title": "Initial run queue · P50 / P95",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "Admission to the first stage, from the persisted run receipt. Later stage waits appear in resource wait.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "noValue": "No observations",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 8,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "histogram_quantile(0.5, sum by(le,backend,outcome)(rate(deep_run_queue_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{backend}} · {{outcome}} · P50"
+            },
+            {
+              "refId": "B",
+              "expr": "histogram_quantile(0.95, sum by(le,backend,outcome)(rate(deep_run_queue_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{backend}} · {{outcome}} · P95"
+            }
+          ],
+          "gridPos": {
+            "x": 0,
+            "y": 22,
+            "w": 8,
+            "h": 8
+          }
+        },
+        {
+          "id": 31,
+          "title": "Parent run duration · P50 / P95",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "Persisted active parent duration, excluding initial queue time. Owned cleanup can outlive this duration; inspect the trace.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "noValue": "No observations",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 8,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "histogram_quantile(0.5, sum by(le,backend,outcome)(rate(deep_run_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{backend}} · {{outcome}} · P50"
+            },
+            {
+              "refId": "B",
+              "expr": "histogram_quantile(0.95, sum by(le,backend,outcome)(rate(deep_run_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{backend}} · {{outcome}} · P95"
+            }
+          ],
+          "gridPos": {
+            "x": 8,
+            "y": 22,
+            "w": 8,
+            "h": 8
+          }
+        },
+        {
+          "id": 7,
+          "title": "Resource wait · P50 / P95",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "Successful acquisitions only. Cancelled/rejected waits are excluded.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "noValue": "No observations",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 8,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "histogram_quantile(0.5, sum by(le,resource_group)(rate(deep_resource_wait_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{resource_group}} · P50"
+            },
+            {
+              "refId": "B",
+              "expr": "histogram_quantile(0.95, sum by(le,resource_group)(rate(deep_resource_wait_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{resource_group}} · P95"
+            }
+          ],
+          "gridPos": {
+            "x": 16,
+            "y": 22,
+            "w": 8,
+            "h": 8
+          }
+        },
+        {
+          "id": 8,
+          "title": "Model HTTP duration · P50 / P95",
+          "type": "timeseries",
+          "gridPos": {
+            "x": 0,
+            "y": 30,
+            "w": 8,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "histogram_quantile(0.5, sum by(le, backend)(rate(deep_model_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{backend}} · P50"
+            },
+            {
+              "refId": "B",
+              "expr": "histogram_quantile(0.95, sum by(le, backend)(rate(deep_model_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{backend}} · P95"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "title": "Image communication attempt · P50 / P95",
+          "type": "timeseries",
+          "gridPos": {
+            "x": 8,
+            "y": 30,
+            "w": 8,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "histogram_quantile(0.5, sum by(le, outcome)(rate(deep_image_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{outcome}} · P50"
+            },
+            {
+              "refId": "B",
+              "expr": "histogram_quantile(0.95, sum by(le, outcome)(rate(deep_image_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{outcome}} · P95"
+            }
+          ],
+          "description": "Includes image queueing, MCP communication and cleanup. Reconciliation creates another communication attempt."
+        },
+        {
+          "id": 32,
+          "title": "Native recovery duration · P50 / P95",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "noValue": "No observations",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 8,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "histogram_quantile(0.5, sum by(le,resource_group,outcome)(rate(deep_model_recovery_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{resource_group}} · {{outcome}} · P50"
+            },
+            {
+              "refId": "B",
+              "expr": "histogram_quantile(0.95, sum by(le,resource_group,outcome)(rate(deep_model_recovery_duration_seconds_bucket{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}[$__rate_interval])))",
+              "legendFormat": "{{resource_group}} · {{outcome}} · P95"
+            }
+          ],
+          "gridPos": {
+            "x": 16,
+            "y": 30,
+            "w": 8,
+            "h": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "title": "Outcomes · success, failures and ownership",
+      "type": "row",
+      "collapsed": true,
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [
+        {
+          "id": 10,
+          "title": "Run outcomes · process totals",
+          "type": "timeseries",
+          "gridPos": {
+            "x": 0,
+            "y": 23,
+            "w": 8,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by(backend,outcome)(deep_run_finished_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+              "legendFormat": "{{backend}} · {{outcome}}"
+            }
+          ],
+          "description": "Cumulative counts for selected live process instances; these reset at process restart. An absent outcome series means no observation, not a measured zero."
+        },
+        {
+          "id": 11,
+          "title": "Model outcomes · process totals",
+          "type": "timeseries",
+          "gridPos": {
+            "x": 8,
+            "y": 23,
+            "w": 8,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by(backend,outcome)(deep_model_calls_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+              "legendFormat": "{{backend}} · {{outcome}}"
+            }
+          ]
+        },
+        {
+          "id": 33,
+          "title": "Image attempts · process totals",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "Owned image communication attempts, including reconciliation. One image job can have more than one attempt.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "noValue": "No observations",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 8,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by(outcome)(deep_image_attempts_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+              "legendFormat": "{{outcome}}"
+            }
+          ],
+          "gridPos": {
+            "x": 16,
+            "y": 23,
+            "w": 8,
+            "h": 8
+          }
+        },
+        {
+          "id": 12,
+          "title": "Native recovery outcomes · process totals",
+          "type": "timeseries",
+          "gridPos": {
+            "x": 0,
+            "y": 31,
+            "w": 8,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by(resource_group,outcome)(deep_model_recoveries_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+              "legendFormat": "{{resource_group}} · {{outcome}}"
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "title": "Transport failures · process totals",
+          "type": "timeseries",
+          "gridPos": {
+            "x": 8,
+            "y": 31,
+            "w": 8,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by(backend,kind)(deep_model_transport_failures_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+              "legendFormat": "{{backend}} · {{kind}}"
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "title": "Resource acquisitions · all outcomes",
+          "type": "timeseries",
+          "gridPos": {
+            "x": 16,
+            "y": 31,
+            "w": 8,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by(resource_group,outcome)(deep_resource_acquisitions_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+              "legendFormat": "{{resource_group}} · {{outcome}}"
+            }
+          ],
+          "description": "Cumulative acquired, queue_full and ownership_blocked outcomes for selected processes."
+        },
+        {
+          "id": 26,
+          "title": "Run success ratio · process totals",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "Successes divided by all observed outcomes for the selected processes. No observations means unknown. This is a process-total ratio, not a windowed SLO.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "noValue": "No observations",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 8,
+                "showPoints": "never"
+              },
+              "min": 0,
+              "max": 1
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "(sum by(backend)(deep_run_finished_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\",outcome=\"succeeded\"}) or on(backend) (0 * sum by(backend)(deep_run_finished_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}))) / sum by(backend)(deep_run_finished_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+              "legendFormat": "{{backend}}"
+            }
+          ],
+          "gridPos": {
+            "x": 0,
+            "y": 39,
+            "w": 8,
+            "h": 8
+          }
+        },
+        {
+          "id": 27,
+          "title": "Model success ratio · process totals",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "Successes divided by all observed outcomes for the selected processes. No observations means unknown. This is a process-total ratio, not a windowed SLO.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "noValue": "No observations",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 8,
+                "showPoints": "never"
+              },
+              "min": 0,
+              "max": 1
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "(sum by(backend)(deep_model_calls_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\",outcome=\"succeeded\"}) or on(backend) (0 * sum by(backend)(deep_model_calls_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"}))) / sum by(backend)(deep_model_calls_total{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+              "legendFormat": "{{backend}}"
+            }
+          ],
+          "gridPos": {
+            "x": 8,
+            "y": 39,
+            "w": 8,
+            "h": 8
+          }
+        },
+        {
+          "id": 6,
+          "title": "Oldest unresolved receipt · age since creation",
+          "type": "timeseries",
+          "gridPos": {
+            "x": 16,
+            "y": 39,
+            "w": 8,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepAfter",
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max by(resource_group)(deep_ownership_unresolved_age_seconds{service_name=\"deep-server\",service_instance_id=~\"${instance:regex}\"})",
+              "legendFormat": "{{resource_group}}"
+            }
+          ],
+          "description": "Frozen ownership group. Old groups absent from current configuration appear as unconfigured. This measures age since operation creation, not time since it became unresolved."
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "title": "Runtime logs · optional raw feed",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 22,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 40,
+      "title": "Runtime output · operator-owned raw logs",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Optional runtime-logs agent. These unredacted streams can contain paths, prompts and error payloads. Independent of the Deep process selector; choose Runtime and Log contains. Timestamp is collection time, including initial backfill. Expand a line for host_name metadata.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_namespace=\"deep-runtime\",service_name=~\"${runtime:regex}\"} |= ${log_search:doublequote} | decolorize | line_format \"{{.service_name}}@{{.host_name}} | {{__line__}}\"",
+          "queryType": "range",
+          "maxLines": 300
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 24,
+        "h": 12
+      }
+    }
+  ],
+  "description": "Live Deep status, correlated runs and optional raw runtime output. Expand Latency or Outcomes for details. Missing observations are unknown; use sampler age to judge freshness.",
+  "links": [
+    {
+      "title": "Tempo Explore",
+      "type": "link",
+      "targetBlank": false,
+      "url": "/explore?left=%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22queryType%22%3A%22traceql%22%2C%22query%22%3A%22%7B%20resource.service.name%20%3D%20%5C%22deep-server%5C%22%20%26%26%20name%20%3D%20%5C%22run%5C%22%20%7D%20with%20(most_recent%3Dtrue)%22%7D%5D%2C%22range%22%3A%7B%22from%22%3A%22now-30m%22%2C%22to%22%3A%22now%22%7D%7D"
+    },
+    {
+      "title": "Loki Explore",
+      "type": "link",
+      "targetBlank": false,
+      "url": "/explore?left=%7B%22datasource%22%3A%22loki%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22expr%22%3A%22%7Bservice_namespace%3D%5C%22deep-runtime%5C%22%7D%22%7D%5D%2C%22range%22%3A%7B%22from%22%3A%22now-30m%22%2C%22to%22%3A%22now%22%7D%7D"
+    }
+  ]
+}

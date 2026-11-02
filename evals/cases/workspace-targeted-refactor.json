@@ -1,0 +1,29 @@
+{
+  "id": "workspace-targeted-refactor",
+  "provenance": "Synthetic task from the agent-environment assessment supplied on 2026-11-02. Exercises source search, exact edits and deletion through one candidate workspace.",
+  "capability": "workspace-files",
+  "original_fault": "The native workspace could replace complete files but could not search contents, perform a targeted edit, or delete an obsolete file.",
+  "setup": {
+    "files": {
+      "lib.js": "// Keep this comment and spacing.\r\nexport function oldName() { return 42; }\r\n",
+      "app.js": "import { oldName } from './lib.js';\nconsole.log(oldName());\n",
+      "obsolete.txt": "Obsolete scratch notes.\n",
+      "keep.md": "  Keep these exact bytes.\n€\n"
+    },
+    "assets": []
+  },
+  "prompt": "Rename the JavaScript function oldName to answer throughout this project, preserving all other text, whitespace and line endings exactly. Remove obsolete.txt. Leave keep.md unchanged. Search and inspect the current files, use targeted edits, and check the resulting files before finishing.",
+  "expect": [
+    "The export, import and call all use answer.",
+    "obsolete.txt is absent from the new revision and still present in the old revision.",
+    "Unrelated content and line endings remain byte-for-byte unchanged."
+  ],
+  "checks": {
+    "files": {
+      "lib.js": "// Keep this comment and spacing.\r\nexport function answer() { return 42; }\r\n",
+      "app.js": "import { answer } from './lib.js';\nconsole.log(answer());\n",
+      "obsolete.txt": null
+    }
+  },
+  "notes": "No shell, compute, web or image grants are needed. Automated checks judge saved files and revision receipts, not exact assistant wording or a particular tool sequence."
+}

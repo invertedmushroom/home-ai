@@ -1,0 +1,4 @@
+*
+!Dockerfile
+!runner.cjs
+!outputs.cjs

@@ -1,0 +1,52 @@
+name: deep-observability
+services:
+  lgtm:
+    image: &lgtm-image docker.io/grafana/otel-lgtm:0.29.0@sha256:6e14b923e0130b8b294ca5bcc7c94d54e899d150817e6c3ed82d9b665afe5499
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      # Grafana requires Editor for Explore. This operator UI is loopback-only.
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Editor
+      PROMETHEUS_EXTRA_ARGS: --storage.tsdb.retention.time=24h
+    ports:
+      - '127.0.0.1:13000:3000'
+      - '127.0.0.1:14318:4318'
+      - '127.0.0.1:19090:9090'
+      - '127.0.0.1:13200:3200'
+    volumes:
+      - ./otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml:ro
+      - ./prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
+      - ./dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/deep.yaml:ro
+      - ./deep-overview.json:/otel-lgtm/deep-overview.json:ro
+    mem_limit: 2g
+    cpus: 2
+    healthcheck:
+      test: ['CMD', 'cat', '/tmp/ready']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  logs-agent:
+    profiles: [runtime-logs]
+    image: *lgtm-image
+    entrypoint: [/otel-lgtm/otelcol-contrib/otelcol-contrib]
+    command: [--config=/etc/deep/runtime-logs.yaml]
+    environment:
+      DEEP_LLAMA_LOG_INCLUDE: /runtime-logs/llama-server/${DEEP_LLAMA_LOG_GLOB:-*.log}
+      DEEP_WANGP_LOG_INCLUDE: /runtime-logs/wangp/${DEEP_WANGP_LOG_GLOB:-*.log}
+      DEEP_LOG_HOST: ${DEEP_LOG_HOST:-local}
+      DEEP_LOG_EXPORT_ENDPOINT: ${DEEP_LOG_EXPORT_ENDPOINT:-http://lgtm:4318}
+      DEEP_LOG_CHECKPOINT_DIR: /tmp/deep-log-offsets
+    volumes:
+      - ./runtime-logs.yaml:/etc/deep/runtime-logs.yaml:ro
+      - ${DEEP_LLAMA_LOG_DIR:-../../logs/llama-server}:/runtime-logs/llama-server:ro
+      - ${DEEP_WANGP_LOG_DIR:-../../logs/wangp}:/runtime-logs/wangp:ro
+    depends_on:
+      lgtm:
+        condition: service_healthy
+    mem_limit: 256m
+    cpus: 0.5
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://127.0.0.1:13133/ready]
+      interval: 5s
+      timeout: 3s
+      retries: 12

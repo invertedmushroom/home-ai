@@ -1,0 +1,38 @@
+{
+  "name": "deep-local-ai",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "concurrently --kill-others --names api,web \"cargo run -p deep-server\" \"npm run dev --workspace @deep/web\"",
+    "build:web": "npm run build --workspace @deep/web",
+    "build:server": "cargo build --release --locked -p deep-server",
+    "check:web": "npm run check --workspace @deep/web",
+    "test:server": "cargo test --locked",
+    "test:browser": "playwright test",
+    "test:browser:guests": "playwright test --config playwright.guests.config.ts",
+    "test:scripts": "node --test tests/scripts/*.test.mjs",
+    "observability:up": "docker compose -f deploy/observability/compose.yaml up -d --wait",
+    "observability:stop": "docker compose -f deploy/observability/compose.yaml --profile runtime-logs stop",
+    "observability:logs": "docker compose --env-file .env -f deploy/observability/compose.yaml --profile runtime-logs up -d --wait",
+    "observability:logs:stop": "docker compose -f deploy/observability/compose.yaml --profile runtime-logs stop logs-agent",
+    "observability:evidence": "node scripts/observability-evidence.mjs",
+    "observability:check": "node scripts/observability-check.mjs",
+    "test:search": "node --test --test-timeout=30000 tests/search/*.test.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "concurrently": "10.0.6",
+    "prettier": "3.9.10"
+  },
+  "overrides": {
+    "monaco-editor": {
+      "dompurify": "3.4.17"
+    }
+  }
+}

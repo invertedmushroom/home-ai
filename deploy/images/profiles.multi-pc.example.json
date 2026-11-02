@@ -1,0 +1,28 @@
+[
+  {
+    "id": "flux-local",
+    "label": "FLUX.2 Klein 4B - local GPU PC",
+    "endpoint": "http://127.0.0.1:8000/mcp",
+    "resource_group": "text-pc-gpu",
+    "settings": {
+      "model_type": "flux2_klein_4b",
+      "resolution": "512x512",
+      "num_inference_steps": 4,
+      "activated_loras": [],
+      "loras_multipliers": ""
+    }
+  },
+  {
+    "id": "flux-second",
+    "label": "FLUX.2 Klein 4B - second GPU PC via SSH",
+    "endpoint": "http://127.0.0.1:8001/mcp",
+    "resource_group": "second-text-pc-gpu",
+    "settings": {
+      "model_type": "flux2_klein_4b",
+      "resolution": "512x512",
+      "num_inference_steps": 4,
+      "activated_loras": [],
+      "loras_multipliers": ""
+    }
+  }
+]

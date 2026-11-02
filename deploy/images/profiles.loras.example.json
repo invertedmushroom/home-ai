@@ -1,0 +1,32 @@
+[
+  {
+    "id": "klein-composable",
+    "label": "Klein with optional image styles",
+    "endpoint": "http://127.0.0.1:8000/mcp",
+    "settings": {
+      "model_type": "flux2_klein_4b",
+      "resolution": "512x512",
+      "num_inference_steps": 4,
+      "activated_loras": [],
+      "loras_multipliers": ""
+    },
+    "lora_catalog": [
+      {
+        "id": "selfie",
+        "label": "Selfie perspective",
+        "description": "Example only: replace with a locally installed adapter trained for this exact base. Use for close-up selfie framing.",
+        "file": "replace-with-compatible-selfie.safetensors",
+        "trigger_words": ["replace-with-trained-trigger"],
+        "strength": 0.7
+      },
+      {
+        "id": "neon",
+        "label": "Neon style",
+        "description": "Example only: replace with a locally installed adapter trained for this exact base. Use for its trained neon aesthetic.",
+        "file": "replace-with-compatible-neon.safetensors",
+        "trigger_words": [],
+        "strength": 0.4
+      }
+    ]
+  }
+]

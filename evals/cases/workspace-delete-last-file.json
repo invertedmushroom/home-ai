@@ -1,0 +1,17 @@
+{
+  "id": "workspace-delete-last-file",
+  "provenance": "Synthetic task added on 2026-11-02 to cover deletion-only publication and an empty resulting project.",
+  "capability": "workspace-files",
+  "original_fault": "The candidate artifact recorded writes but omitted deletions, so a deletion-only change could be lost at publication.",
+  "setup": {
+    "files": { "scratch.txt": "Temporary notes.\n" },
+    "assets": []
+  },
+  "prompt": "Delete scratch.txt from the current project. The resulting project should contain no files. Check the inventory afterwards. Keep the old revision available and create no replacement file.",
+  "expect": [
+    "A new revision exists with an empty file inventory.",
+    "The old revision still contains scratch.txt with its original contents."
+  ],
+  "checks": { "files": { "scratch.txt": null } },
+  "notes": "This is a project text-file deletion, not workspace deletion or asset-library cleanup."
+}
